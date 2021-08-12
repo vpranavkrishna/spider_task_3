@@ -23,7 +23,6 @@ private ProgressBar progressBar;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_hero_detail);
-        setTitle("Info Page");
         detail = getIntent().getStringExtra("herodetail");
         textView = findViewById(R.id.herodetail);
         imageView = findViewById(R.id.heropic);
