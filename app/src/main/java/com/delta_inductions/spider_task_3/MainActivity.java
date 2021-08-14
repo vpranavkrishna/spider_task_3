@@ -1,47 +1,51 @@
 package com.delta_inductions.spider_task_3;
-
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.core.app.ActivityOptionsCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
+import android.widget.ImageView;
 
 import com.delta_inductions.spider_task_3.Adapter.Onitemclicklistener;
 import com.delta_inductions.spider_task_3.Adapter.SuperheroAdapter;
 import com.delta_inductions.spider_task_3.Api.SuperheroApi;
 import com.delta_inductions.spider_task_3.Model.Superhero;
-
-import java.lang.reflect.Array;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
 public class MainActivity extends AppCompatActivity implements Onitemclicklistener {
 private static final String BASE_URL= "https://akabab.github.io/superhero-api/api/";
-private RecyclerView Herolist;
-private LinearLayoutManager manager;
 private SuperheroAdapter superheroAdapter;
 private ArrayList<Superhero> superheroArrayList;
     private Retrofit retrofit;
     private SuperheroApi superheroApi;
     private String herodetail;
     private String Url;
+    private LinearLayoutManager manager = new LinearLayoutManager(MainActivity.this);
+    private RecyclerView Herolist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle("Superheroes");
         Herolist = findViewById(R.id.recyclerview);
+        Herolist.setLayoutManager(manager);
         getRetrofit();
         superheroApi = getRetrofit();
+
         getSuper();
     }
 
@@ -84,7 +88,7 @@ private ArrayList<Superhero> superheroArrayList;
 
 
     @Override
-    public void itemclickList(int position) {
+    public void itemclickList(int position, ImageView imageView) {
         Superhero superhero = superheroArrayList.get(position);
         herodetail = "Name :" + superhero.getName() +"\n"+"Slug :"+superhero.getSlug()+"\n\n"+"PowerStats"+"\n"+"Intelligence :"+superhero.getPowerstats().getIntelligence()
                 +"\n" + "Strength :"+superhero.getPowerstats().getStrength()+"\n"+"Speed :" +superhero.getPowerstats().getSpeed()+"\n"+"Durability :"+superhero.getPowerstats().getDurability()
@@ -96,9 +100,31 @@ private ArrayList<Superhero> superheroArrayList;
         +"Relatives :"+superhero.getConnections().getRelatives();
         Url = superhero.getImage().getURl();
         Intent intent = new Intent(this,HeroDetail.class);
+        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this,imageView, ViewCompat.getTransitionName(imageView));
         intent.putExtra("herodetail",herodetail);
         intent.putExtra("Url",Url);
-        startActivity(intent);
+        startActivity(intent,options.toBundle());
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.toolbar,menu);
+        MenuItem searchitem = menu.findItem(R.id.action_search);
+        androidx.appcompat.widget.SearchView searchView =(androidx.appcompat.widget.SearchView) searchitem.getActionView();
+        searchView.setImeOptions(EditorInfo.IME_ACTION_DONE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchView.setQueryHint("Search by Name or ID....");
+                superheroAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });
+        return true;
     }
 
 }

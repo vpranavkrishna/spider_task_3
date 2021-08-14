@@ -17,7 +17,8 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.014" />
+        app:layout_constraintVertical_bias="0.014"
+        android:transitionName="hero_transistion"/>
 
 
     <ProgressBar
@@ -27,7 +28,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/heropic"
         app:layout_constraintEnd_toEndOf="@+id/heropic"
         app:layout_constraintStart_toStartOf="@+id/heropic"
-        app:layout_constraintTop_toTopOf="@+id/heropic" />
+        app:layout_constraintTop_toTopOf="@+id/heropic"
+        android:transitionName="hero_transistion"/>
 
     <ScrollView
         android:id="@+id/scrollView"

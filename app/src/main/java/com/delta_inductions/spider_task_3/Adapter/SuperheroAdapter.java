@@ -5,6 +5,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Adapter;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -14,15 +17,18 @@ import com.delta_inductions.spider_task_3.R;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
+import java.util.List;
 
-public class SuperheroAdapter extends RecyclerView.Adapter<SuperheroAdapter.SuperheroViewHolder> {
+public class SuperheroAdapter extends RecyclerView.Adapter<SuperheroAdapter.SuperheroViewHolder>implements Filterable  {
     private ArrayList<Superhero> SuperheroList;
+    private ArrayList<Superhero> SuperherofullList;
     private Context mContext;
     private Onitemclicklistener listener;
 
     public SuperheroAdapter(Context context, ArrayList<Superhero> superheroesList) {
         mContext = context;
         SuperheroList = superheroesList;
+        SuperherofullList = new ArrayList<>(superheroesList);
     }
     @NonNull
     @Override
@@ -49,6 +55,41 @@ public class SuperheroAdapter extends RecyclerView.Adapter<SuperheroAdapter.Supe
         });
     }
     @Override
+    public Filter getFilter() {
+        return SuperheroListFilter;
+    }
+    private Filter SuperheroListFilter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            List<Superhero> Superherofilterlist = new ArrayList<>();
+            if(constraint==null||constraint.length() == 0 )
+            {
+                Superherofilterlist.addAll(SuperherofullList);
+            }
+            else
+            {
+                String filterpattern = constraint.toString().toLowerCase().trim();
+                for(Superhero item : SuperherofullList)
+                {
+                    if(item.getName().toLowerCase().contains(filterpattern) || String.valueOf(item.getId()).equals(filterpattern))
+                    {
+                        Superherofilterlist.add(item);
+                    }
+                }
+            }
+            FilterResults results = new FilterResults();
+            results.values = Superherofilterlist;
+            return results;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            SuperheroList.clear();
+            SuperheroList.addAll((ArrayList) results.values);
+            notifyDataSetChanged();
+        }
+    };
+    @Override
     public int getItemCount() {
         return SuperheroList.size();
     }
@@ -70,7 +111,7 @@ public class SuperheroAdapter extends RecyclerView.Adapter<SuperheroAdapter.Supe
                     if (listener != null) {
                         int position = getAdapterPosition();
                         if(position!=RecyclerView.NO_POSITION)
-                            listener.itemclickList(position);
+                            listener.itemclickList(position,imageView);
                     }
                 }
             });
